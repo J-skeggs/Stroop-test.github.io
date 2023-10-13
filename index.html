@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stroop Test</title>
+  <style>
+	body {
+  font-family: Arial, sans-serif;
+  background-color: #f0f0f0;
+  margin: 0;
+  padding: 0;
+}
+
+.container {
+  max-width: 600px;
+  margin: 100px auto;
+  padding: 20px;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  text-align: center;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.hidden {
+  display: none;
+}
+
+h1 {
+  font-size: 32px;
+  margin-bottom: 20px;
+  color: #3498db;
+}
+
+p {
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+ul {
+  text-align: left;
+  margin-left: 30px;
+  margin-bottom: 20px;
+}
+
+li {
+  font-size: 16px;
+  margin-bottom: 8px;
+}
+
+button {
+  font-size: 18px;
+  padding: 10px 20px;
+  background-color: #3498db;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #2980b9;
+}
+
+#resultsBox {
+  margin-top: 40px;
+}
+
+#resultsContainer {
+  margin-top: 20px;
+  text-align: left;
+  font-size: 16px;
+  max-height: 200px; 
+  overflow-y: auto; 
+}
+
+#resultsContainer p {
+  margin-bottom: 10px;
+}
+
+#resultsContainer p:last-child {
+  margin-bottom: 0;
+}
+
+  </style>
+</head>
+<body>
+  <div class="container" id="startScreen">
+    <h1>Stroop Test</h1>
+    <p>Rules:</p>
+    <ul>
+      <li>Words will appear on the screen in different colors.</li>
+      <li>Your task is to identify the word itself, not the color of the word.</li>
+      <li>Click "Start Test" when you are ready.</li>
+    </ul>
+    <button id="startButton">Start Test</button>
+  </div>
+
+  <div class="container hidden" id="testScreen">
+    <p id="word"></p>
+	<button id="nextButton" class="nextButton">Next</button>
+  </div>
+  
+  <div class="container hidden" id="resultsBox">
+	<button id="showResultsButton" >Show Results</button>
+	<div id="resultsContainer" style="display: none;"></div>
+  </div>
+  
+  <script>  const words = ['Red', 'Green', 'Blue', 'Yellow', 'Purple', 'Orange', 'Pink', 'Brown'];
+  const colors = ['red', 'green', 'blue', 'yellow', 'purple', 'orange', 'pink', 'brown'];
+
+  const startButton = document.getElementById('startButton');
+  const startScreen = document.getElementById('startScreen');
+  const testScreen = document.getElementById('testScreen');
+  const nextButton = document.getElementById('nextButton');
+  const showResultsButton = document.getElementById('showResultsButton');
+  const resultsContainer = document.getElementById('resultsContainer');
+  const wordElement = document.getElementById('word');
+
+  let testStarted = false;
+  let testResults = [];
+  let startTime;
+  let timeElapsedArray = []; 
+  let wordsArray = []; 
+  let clickCount = 1; 
+  startButton.addEventListener('click', startTest);
+  nextButton.addEventListener('click', nextButtonIsClicked);
+  showResultsButton.addEventListener('click', showResults);
+
+  function getRandomWord() {
+    return words[Math.floor(Math.random() * words.length)];
+  }
+
+  function getRandomColor() {
+    return colors[Math.floor(Math.random() * colors.length)];
+  }
+
+  function displayNextWord() {
+    const randomWord = getRandomWord();
+    const randomColor = getRandomColor();
+
+    wordElement.textContent = randomWord;
+    wordElement.style.color = randomColor;
+
+    wordsArray.push(randomWord); 
+  }
+  
+  function endTest () {
+	wordElement.textContent = '';
+	nextButton.classList.add('hidden');
+	testScreen.classList.add('hidden');
+	showResultsButton.classList.remove('hidden');
+	resultsBox.classList.remove('hidden');
+  }
+  
+  function startTest() {
+    startScreen.classList.add('hidden');
+    testScreen.classList.remove('hidden');
+    testStarted = true;
+    nextButton.disabled = false;
+    displayNextWord();
+    startTime = Date.now();
+  }
+
+  function nextButtonIsClicked() {
+    if (!testStarted) return; 
+
+    const endTime = Date.now();
+    const timeElapsed = endTime - startTime;
+    timeElapsedArray.push(timeElapsed);
+   
+	if (clickCount == 40) {
+		nextButton.textContent = 'Finish';
+		clickCount++;
+	}else if(clickCount == 41){
+		endTest();
+		
+	}else {
+		displayNextWord();
+		startTime = endTime;
+		clickCount++;
+    }	
+  }
+  
+  
+  function showResults() {
+    resultsContainer.innerHTML = `
+      <p>Number of Next Button Clicks: ${clickCount}</p>
+      <p>Time Elapsed Array: ${timeElapsedArray}</p>
+      <p>Words Displayed Array: ${wordsArray}</p>
+    `;
+    resultsContainer.style.display = 'block';
+  }</script>
+  
+</body>
+</html>
